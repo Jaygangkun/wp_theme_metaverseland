@@ -1,0 +1,75 @@
+.home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px 50px;
+}
+
+.home-header-left {
+    color: #ffffff;
+}
+
+.home-wrap {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('assets/images/landing.jpeg');
+    min-height: 100vh;
+}
+
+.home-header-link {
+    color: #fdff05;
+    text-transform: capitalize;
+    font-size: 20px;
+    padding: 0px 10px;
+}
+
+.home-header-title {
+    font-size: 60px;
+    font-weight: bold;
+}
+
+.home-header-sub-title {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.home-content {
+    color: #ffffff;
+    padding: 50px;
+}
+
+.home-content-center {
+    min-height: 200px;
+    font-size: 46px;
+    font-weight: bold;
+}
+
+.home-content-bottom-left h2{
+    font-size: 46px;
+    font-weight: bold;
+}
+
+.home-content-bottom-left p {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.home-content-bottom {
+    display: flex;
+}
+
+.home-content-bottom-left {
+    width: 50%;
+}
+
+.home-content-bottom-right {
+    width: 50%;
+    color: #ff7eba;
+    text-align: center;
+}
+
+.home-content-bottom-right h3 {
+    font-size: 40px;
+    font-weight: bold;
+}
