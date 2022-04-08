@@ -637,3 +637,226 @@ function twentytwentyone_add_ie_class() {
 	<?php
 }
 add_action( 'wp_footer', 'twentytwentyone_add_ie_class' );
+
+
+
+// add custom codes
+
+// frontend ajax
+function metaverseland_login() {
+	$_SESSION['loginUser'] = '';
+    // First check the nonce, if it fails the function will break
+    check_ajax_referer( 'ajax-login-nonce', 'security' );
+
+    // Nonce is checked, get the POST data and sign user on
+    $info = array();
+    $info['user_login'] = $_POST['email'];
+    $info['user_password'] = $_POST['password'];
+    $info['remember'] = true;
+
+    $user_signon = wp_signon( $info, false );
+    if ( !is_wp_error($user_signon) ){
+        wp_set_current_user($user_signon->ID);
+        wp_set_auth_cookie($user_signon->ID);
+        echo json_encode(array(
+			'success' => true, 
+			'message' => __('Login successful, redirecting...')
+		));
+
+		// $to = $user_signon->user_email;
+		// $subject = 'MYRRID Login';
+		// $body = 'Your MyRRID Profile has been logged in to, if it was not you please deactivate your e-ID immediately.';
+		// $headers = array('Content-Type: text/html; charset=UTF-8');
+		
+		// wp_mail( $to, $subject, $body, $headers );
+
+		// $_SESSION['loginUser'] = 'CT';
+    }
+	else {
+		echo json_encode(array(
+			'success' => false
+		));
+	}
+
+    die();
+}
+add_action("wp_ajax_metaverseland_login", "metaverseland_login");
+add_action("wp_ajax_nopriv_metaverseland_login", "metaverseland_login");
+
+function metaverseland_signup() {
+	$resp = array('success' => false);
+
+	$username = isset($_POST['username']) ? $_POST['username'] : '';
+	$email = isset($_POST['email']) ? $_POST['email'] : '';
+	$password = isset($_POST['password']) ? $_POST['password'] : '';
+	
+	if($username == '' || $email == '' || $password == '') {
+		$resp['message'] = 'No Username or Email or Password';
+	}
+	else {
+		if(username_exists($username)) {
+			$resp['message'] = 'Username already exists';
+		}
+		else if(email_exists($email)) {
+			$resp['message'] = 'Email already exists';
+		}
+		else {
+			$user_id = wp_create_user($username, $password, $email);
+
+			if(!is_wp_error($user_id)) {
+				$user = new WP_User($user_id);
+				$user->set_role('subscriber');
+			}
+
+			$resp['user_id'] = $user_id;
+			$resp['success'] = true;
+		}
+	}
+
+	echo json_encode($resp);
+    die();
+}
+add_action("wp_ajax_metaverseland_signup", "metaverseland_signup");
+add_action("wp_ajax_nopriv_metaverseland_signup", "metaverseland_signup");
+
+function metaverseland_forget_password() {
+	$resp = array('success' => true);
+
+	echo json_encode($resp);
+    die();
+}
+add_action("wp_ajax_metaverseland_forget_password", "metaverseland_forget_password");
+add_action("wp_ajax_nopriv_metaverseland_forget_password", "metaverseland_forget_password");
+
+
+function metaverseland_parcel_purchase() {
+	$user = wp_get_current_user();
+
+	$resp = array(
+		'success' => false,
+	);
+
+	$parcel_price = isset($_POST['parcel_price']) ? $_POST['parcel_price'] : '';
+	$address = isset($_POST['address']) ? $_POST['address'] : '';
+	$lat = isset($_POST['lat']) ? $_POST['lat'] : '';
+	$lng = isset($_POST['lng']) ? $_POST['lng'] : '';
+	$country = isset($_POST['country']) ? $_POST['country'] : '';
+		
+	$parcel_id = wp_insert_post(array (
+		'post_type' => 'parcel',
+		'post_title' => $address,
+		'post_content' => '',
+		'post_status' => 'private',
+		'author' => $user->ID,
+		'comment_status' => 'closed',   // if you prefer
+		'ping_status' => 'closed',      // if you prefer
+	));
+
+	if ($parcel_id) {
+		add_post_meta($parcel_id, 'lat', $lat);
+		add_post_meta($parcel_id, 'lng', $lng);
+		add_post_meta($parcel_id, 'address', $address);
+		add_post_meta($parcel_id, 'country', $country);
+		add_post_meta($parcel_id, 'owner', $user->ID);
+		add_post_meta($parcel_id, 'purchase_price', $parcel_price);
+
+		$resp['success'] = true;
+		$resp['parcel_id'] = $parcel_id;
+		// ob_start();
+		// showWristbands();
+		// $wristband_list_html = ob_get_contents();
+		// ob_end_clean();
+		// $resp['html'] = $wristband_list_html;
+	}
+
+	echo json_encode($resp);
+
+	die();
+}
+add_action("wp_ajax_metaverseland_parcel_purchase", "metaverseland_parcel_purchase");
+add_action("wp_ajax_nopriv_metaverseland_parcel_purchase", "metaverseland_parcel_purchase");
+
+// backend ajax
+add_action("wp_ajax_metaverseland_setting_apply", "metaverseland_setting_apply");
+add_action("wp_ajax_nopriv_metaverseland_setting_apply", "metaverseland_setting_apply");
+
+function metaverseland_setting_apply() {
+
+    $resp = array('success' => true);
+
+	if(isset($_POST['parcel_price'])) {
+		if(get_option('metaverseland_setting_parcel_price')) {
+			update_option('metaverseland_setting_parcel_price', $_POST);
+		}
+		else {
+			add_option('metaverseland_setting_parcel_price', $_POST);
+		}
+		
+	}
+	else {
+		$resp['success'] = false;
+		$resp['message'] = 'No Found Price.';
+	}
+    
+    echo json_encode($resp);
+    die();
+}
+
+add_action( 'admin_menu', 'metaverseland_settings_menu_page');
+function metaverseland_settings_menu_page() {
+  add_menu_page( 'Parcel Setting', 'Parcel Setting', 'manage_options', 'metaverseland-parcel-setting', 'metaverseland_setting_page', 'dashicons-welcome-widgets-menus', 90 );
+}
+
+function metaverseland_setting_page() {
+    ?>
+	<div class="wpbody">
+		<div class="wpbody-content">
+			<div class="wrap">
+				<h1 class="wp-heading-inline">Parcel Setting</h1>
+				<div>
+					<label for="edit_citations_per_page">Parcel Price(USD):</label>
+					<?php
+					$parcel_price = '';
+					$option_metaverseland_setting_parcel_price = get_option('metaverseland_setting_parcel_price');
+					if($option_metaverseland_setting_parcel_price) {
+						$parcel_price = $option_metaverseland_setting_parcel_price['parcel_price'];
+					}
+					?>
+					<input type="number" step="1" min="1" class="screen-per-page" id="parcel_price" value="<?php echo $parcel_price?>">
+				</div>
+				<input type="button" class="button button-primary" id="btn_apply" value="Apply">
+			</div>
+		</div>
+	</div>
+	<script>
+	var ajax_url = '<?php echo admin_url('admin-ajax.php')?>';
+	jQuery(document).on('click', '#btn_apply', function() {
+		if(jQuery('#parcel_price').val() == '') {
+			alert('Please input parcel price!');
+			jQuery('#parcel_price').focus();
+			return;
+		}
+
+		jQuery.ajax({
+			url: ajax_url,
+			type: 'post',
+			data: {
+				action: 'metaverseland_setting_apply',
+				parcel_price: jQuery('#parcel_price').val()
+			},
+			dataType: 'json',
+			success: function(resp) {
+				if(!resp.success) {
+					alert(resp.message);
+				}
+				else {
+					// $('#alert_message').slideUp();
+					alert('Saved Successfully!');
+				}
+			}
+		})
+	})
+	</script>
+	<?php
+    
+}
