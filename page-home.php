@@ -24,8 +24,9 @@
 				<h3 class="home-header-sub-title">The Home of Afforadable Metaverse Land Deals</h3>
 			</div>
 			<div class="home-header-right">
-				<a class="home-header-link">Buy Land Now Map</a>
-				<a class="home-header-link">For Sale By Owner Map</a>
+				<a class="home-header-link" href="/buy-land-map-page/">Buy Land Now Map</a>
+				<a class="home-header-link" href="/for-sale-by-owner-map/">For Sale By Owner Map</a>
+				<a class="home-header-link" href="/faq">FAQ</a>
 				<a class="home-header-link">Signup/Login</a>
 			</div>
 		</div>

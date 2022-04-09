@@ -212,3 +212,116 @@ html {
 .map-popup-btn-make-offer {
     white-space: nowrap;
 }
+
+.page-wrap {
+    width: 80%;
+    margin: auto;
+    margin-top: 50px;
+}
+
+.color-red {
+    color: #CA211E;
+    font-weight: bold;
+}
+
+.faq-p {
+    margin-bottom: 20px;
+}
+
+.page-content-faq .page-wrap {
+    max-width: 600px;
+}
+
+.mapboxgl-ctrl-top-right {
+    right: initial;
+    left: 0px;
+}
+
+.mapboxgl-ctrl-group:not(:empty) {
+    display: none;
+}
+
+@media screen and (max-width: 1620px) {
+    .home-header-title {
+        font-size: 50px;
+    }
+
+    .home-header-sub-title {
+        font-size: 26px;
+    }
+}
+
+@media screen and (max-width: 1400px) { 
+    .home-header {
+        display: block;
+        text-align: center;
+    }
+
+    .home-header-left {
+        margin-bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .home-content-bottom {
+        display: block;
+    }
+
+    .home-content-bottom-left {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .home-content-bottom-right {
+        width: 100%;
+    }
+
+    .home-content-bottom-left h2 {
+        font-size: 36px;
+    }
+
+    .home-content-bottom-right h3 {
+        font-size: 32px;
+    }
+
+    .home-content-center {
+        text-align: center;
+        font-size: 40px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .home-header-title {
+        font-size: 40px;
+    }
+
+    .home-header-sub-title {
+        font-size: 20px;
+    }
+
+    .home-header-link {
+        font-size: 16px;
+    }
+
+    .home-content-center {
+        font-size: 30px;
+    }
+
+    .home-content-bottom-left h2 {
+        font-size: 30px;
+    }
+
+    .home-content-bottom-left p {
+        font-size: 20px;
+        margin-bottom: 0px;
+    }
+
+    .home-content-bottom-right h3 {
+        font-size: 20px;
+    }
+
+    .home-content-bottom-right h2 {
+        font-size: 30px;
+    }
+}

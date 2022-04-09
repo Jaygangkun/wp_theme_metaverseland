@@ -19,6 +19,9 @@
 	<script src='<?php echo get_template_directory_uri()?>/assets/lib/jquery-3.6.0.min.js'></script>
 
 	<link href='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css' rel='stylesheet' />
+	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+	<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css' type='text/css' />
+
 	<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri()?>/assets/lib/bootstrap.min.css">
 	<link type="text/css" rel="stylesheet" href="<?php echo get_template_directory_uri()?>/custom.css">
 	<script>
@@ -28,21 +31,18 @@
 <body <?php body_class(); ?>>
 	<div class="home-header page-header">
 		<div class="home-header-left">
-			<h1 class="home-header-title">Metaverse Land Today</h1>
-			<h3 class="home-header-sub-title">The Home of Afforadable Metaverse Land Deals</h3>
+			<h1 class="home-header-title">Buy Land Now Map</h1>
+			<h3 class="home-header-sub-title">Click the map to zoom in and find individual properties to purchase</h3>
 		</div>
 		<div class="home-header-right">
-			<a class="home-header-link" href="/buy-land-map-page/">Buy Land Now Map</a>
+			<a class="home-header-link" href="/">Home</a>
 			<a class="home-header-link" href="/for-sale-by-owner-map/">For Sale By Owner Map</a>
+			<a class="home-header-link" href="/faq">FAQ</a>
 			<a class="home-header-link">Signup/Login</a>
-			<?php echo json_encode(get_option('metaverseland_setting_parcel_price'))?>
 		</div>
 	</div>
 	<div class="page-content">
 		<div class="map-wrap">
-			<div class="map-search-box">
-				<input type="text" placeholder="Search">
-			</div>
 			<div id='map'></div>
 		</div>
 	</div>
@@ -166,11 +166,22 @@
 			container: 'map', // container ID
 			style: 'mapbox://styles/mapbox/streets-v11', // style URL
 			center: [-101.299591, 40.116386], // starting position [lng, lat]
-			zoom: 4 // starting zoom
+			zoom: 3.5 // starting zoom
 		});
 
 		map.addControl(new mapboxgl.NavigationControl());
  
+		const geocoder = new MapboxGeocoder({
+			// Initialize the geocoder
+			accessToken: mapboxgl.accessToken, // Set the access token
+			mapboxgl: mapboxgl, // Set the mapbox-gl instance
+			marker: false // Do not use the default marker style
+		});
+
+
+		// Add the geocoder to the map
+		map.addControl(geocoder);
+
 		var parcel_map_data = {
 			type: "FeatureCollection",
 			features: []
@@ -209,23 +220,23 @@
 
 		console.log('parcel_map_data:', parcel_map_data);
 		map.on('load', () => {
-			map.addSource('parcels', {
-				type: 'geojson',
-				data: parcel_map_data,
-				cluster: true,
-				clusterRadius: 80
-			})
+			// map.addSource('parcels', {
+			// 	type: 'geojson',
+			// 	data: parcel_map_data,
+			// 	cluster: true,
+			// 	clusterRadius: 80
+			// })
 
-			map.addLayer({
-				'id': 'parcel_points',
-				'type': 'circle',
-				'source': 'parcels',
-				'paint': {
-					'circle-radius': 6,
-					'circle-color': '#B42222'
-				},
-				'filter': ['==', '$type', 'Point']
-			});
+			// map.addLayer({
+			// 	'id': 'parcel_points',
+			// 	'type': 'circle',
+			// 	'source': 'parcels',
+			// 	'paint': {
+			// 		'circle-radius': 6,
+			// 		'circle-color': '#B42222'
+			// 	},
+			// 	'filter': ['==', '$type', 'Point']
+			// });
 
 			function showPopup(coordinates, purchased, properties) {
 				var url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + coordinates[0] + "," + coordinates[1] + ".json?access_token=pk.eyJ1IjoibWV0YXZlcnNlIiwiYSI6ImNsMHNhdDFqNDAxbDIzcHBmZ2RkejZmNXEifQ.Tbn_kA1pvvrWUQgVQ0YJWg";
@@ -325,17 +336,17 @@
 				
 			}
 
-			map.on('click', 'parcel_points', (e) => {
-				console.log(`parcel point click `);
-				// e.originalEvent.stopPropagation();
-				// e.originalEvent.preventDefault();
+			// map.on('click', 'parcel_points', (e) => {
+			// 	console.log(`parcel point click `);
+			// 	// e.originalEvent.stopPropagation();
+			// 	// e.originalEvent.preventDefault();
 
-				parcel_clicked = true;
-				const coordinates = [e.lngLat.lng, e.lngLat.lat];
+			// 	parcel_clicked = true;
+			// 	const coordinates = [e.lngLat.lng, e.lngLat.lat];
 				
-				showPopup(coordinates, true, e.features[0].properties);
+			// 	showPopup(coordinates, true, e.features[0].properties);
 				
-			});
+			// });
 
 			map.on('click', (e) => {
 				console.log('map click');
