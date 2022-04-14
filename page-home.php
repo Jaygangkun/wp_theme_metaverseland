@@ -21,7 +21,7 @@
 		<div class="home-header">
 			<div class="home-header-left">
 				<h1 class="home-header-title">Metaverse Land Today</h1>
-				<h3 class="home-header-sub-title">The Home of Afforadable Metaverse Land Deals</h3>
+				<h3 class="home-header-sub-title">The Home of Affordable Metaverse Land Deals</h3>
 			</div>
 			<div class="home-header-right">
 				<a class="home-header-link" href="/buy-land-map-page/">Buy Land Now Map</a>
@@ -32,7 +32,7 @@
 		</div>
 		<div class="home-content">
 			<div class="home-content-center">
-				<p>Comming Soon! </p>
+				<p>Coming Soon! </p>
 			</div>
 			<div class="home-content-bottom">
 				<div class="home-content-bottom-left">
