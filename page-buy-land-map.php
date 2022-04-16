@@ -28,7 +28,7 @@
 	<div class="home-header page-header">
 		<div class="home-header-left">
 			<h1 class="home-header-title">Buy Land Now Map</h1>
-			<h3 class="home-header-sub-title">Click the map to zoom in and find individual properties to purchase</h3>
+			<h3 class="home-header-sub-title" style="display: none">Click the map to zoom in and find individual properties to purchase</h3>
 		</div>
 		<div class="home-header-right">
 			<a class="home-header-link" href="/">Home</a>
@@ -39,6 +39,9 @@
 	</div>
 	<div class="page-content">
 		<div class="map-wrap">
+			<div class="map-tip">
+				<span class="map-zoom-btn">Zoom in</span> to see homes.
+			</div>
 			<input type="text" placeholder="Search" id="map_search_input">
 			<div id='map'></div>
 		</div>
@@ -340,11 +343,13 @@
 		let infowindow;
 		let map_click_marker;
 		let purchased_markers;
+		let search_markers = [];
 
 		function initMap() {
 			map = new google.maps.Map(document.getElementById("map"), {
 				center: { lat: 40.116386, lng: -101.299591 },
 				zoom: 5,
+				gestureHandling: 'greedy'
 			});
 
 			geocoder = new google.maps.Geocoder();
@@ -374,10 +379,10 @@
 				}
 
 				// Clear out the old markers.
-				markers.forEach((marker) => {
+				search_markers.forEach((marker) => {
 					marker.setMap(null);
 				});
-				markers = [];
+				search_markers = [];
 
 				// For each place, get the icon, name and location.
 				const bounds = new google.maps.LatLngBounds();
@@ -396,15 +401,67 @@
 						scaledSize: new google.maps.Size(25, 25),
 					};
 
-					// Create a marker for each place.
-					markers.push(
-						new google.maps.Marker({
-							map,
-							icon,
-							title: place.name,
-							position: place.geometry.location,
-						})
+					// // Create a marker for each place.
+					var search_marker = new google.maps.Marker({
+						map,
+						// icon,
+						// title: place.name,
+						position: place.geometry.location,
+					});
+
+					google.maps.event.addListener(search_marker,'click',function() {
+						// console.log("click:", marker.getPosition());
+						// map.setCenter(marker.getPosition());
+						var marker_coordinates = {
+							lat: search_marker.getPosition().lat(),
+							lng: search_marker.getPosition().lng(),
+						};
+					
+						geocoder.geocode({ location: search_marker.getPosition() })
+						.then((response) => {
+							if (response.results[0]) {
+								console.log('geocode:', response);
+
+								let place_name = response.results[0].formatted_address;
+								let country = '';
+
+								for(var i = 0; i < response.results[0].address_components.length; i++) {
+									if(response.results[0].address_components[i].types[0] == 'country') {
+										country = response.results[0].address_components[i].long_name;
+									}
+								}							
+								
+								let thumb_image = `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${marker_coordinates.lat},${marker_coordinates.lng}&key=AIzaSyC-Xc14Q7Gg8T8sFzDPPd2Qi_kAzC-mzt8`;
+
+								let content = `<div class="map-popup-wrap">
+									<div class="map-popup-img-wrap" style="background-image:url(${thumb_image})">
+									</div>
+									<div class="map-popup-content-wrap">
+										<div class="map-popup-content-wrap-left">
+											<h3 class="map-popup-title">${place_name}</h3>
+											<p class="map-popup-country">${country}</p>
+											<p class="map-popup-lat-lng" lat="${marker_coordinates.lat}" lng="${marker_coordinates.lng}">${marker_coordinates.lat}, ${marker_coordinates.lng}</p>
+										</div>
+										<div class="map-popup-content-wrap-right">
+											<span class="map-popup-btn map-popup-btn-make-offer">Make Offer</span>
+										</div>
+									</div>
+								</div>`;
+
+								infowindow.setContent(content);
+								infowindow.open(map,this);
+
+							} else {
+								console.log("No results found");
+							}
+						}).catch((e) => console.log("Geocoder failed due to: " + e));
+
+					});
+					
+					search_markers.push(
+						search_marker
 					);
+
 					if (place.geometry.viewport) {
 						// Only geocodes have viewport.
 						bounds.union(place.geometry.viewport);
@@ -416,7 +473,7 @@
 			});
 			
 			purchased_markers = [];
-
+			parcel_map_data = [];
 			for(var index = 0; index < parcel_map_data.length; index ++) {
 				console.log(parcel_map_data[index]);
 					
@@ -447,7 +504,13 @@
 							console.log('geocode:', response);
 
 							let place_name = response.results[0].formatted_address;
-							let country = 'country';
+							let country = '';
+
+							for(var i = 0; i < response.results[0].address_components.length; i++) {
+								if(response.results[0].address_components[i].types[0] == 'country') {
+									country = response.results[0].address_components[i].long_name;
+								}
+							}							
 							
 							let thumb_image = `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${marker_coordinates.lat},${marker_coordinates.lng}&key=AIzaSyC-Xc14Q7Gg8T8sFzDPPd2Qi_kAzC-mzt8`;
 
@@ -480,6 +543,12 @@
 			new markerClusterer.MarkerClusterer({map: map, markers: purchased_markers});
 				
 			map.addListener("click", (e) => {
+				// Clear out the old markers.
+				search_markers.forEach((marker) => {
+					marker.setMap(null);
+				});
+				search_markers = [];
+
 				var coordinates = {
 					lat: e.latLng.lat(),
 					lng: e.latLng.lng(),
@@ -491,7 +560,13 @@
 						console.log('geocode1:', response);
 
 						let place_name = response.results[0].formatted_address;
-						let country = 'country';
+						let country = '';
+
+						for(var i = 0; i < response.results[0].address_components.length; i++) {
+							if(response.results[0].address_components[i].types[0] == 'country') {
+								country = response.results[0].address_components[i].long_name;
+							}
+						}
 						
 						let thumb_image = `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${coordinates.lat},${coordinates.lng}&key=AIzaSyC-Xc14Q7Gg8T8sFzDPPd2Qi_kAzC-mzt8`;
 
@@ -526,7 +601,22 @@
 				}).catch((e) => console.log("Geocoder failed due to: " + e));
 
 			});
+
+			google.maps.event.addListener(map, 'zoom_changed', function() {
+				zoomLevel = map.getZoom();
+				console.log('zoomlevel:', zoomLevel);
+				
+				if (zoomLevel <= 19) {
+					// FTlayer.setMap(map);
+					$('.map-tip').show();
+				} else {
+					$('.map-tip').hide();
+				}
+			});
 			
+			$(document).on('click', '.map-zoom-btn', function() {
+				map.setZoom(zoomLevel = map.getZoom() + 1);
+			})
 		}
 
 		window.initMap = initMap;
