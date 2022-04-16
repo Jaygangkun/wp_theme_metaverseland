@@ -122,11 +122,18 @@ html {
 
 .map-search-box {
     position: absolute;
-    left: 20px;
-    top: 20px;
+    left: 230px;
+    top: 5px;
     background: #ffffff;
     padding: 10px;
     z-index: 1;
+}
+
+#map_search_input {
+    top: 10px !important;
+    padding: 10px !important;
+    font-size: 18px;
+    border: 0px;
 }
 
 .map-popup-img-wrap {
@@ -146,6 +153,7 @@ html {
 .map-popup-wrap {
     background: #ffffff;
     border-radius: 10px;
+    min-width: 400px;
 }
 
 .map-popup-btn {
@@ -160,10 +168,6 @@ html {
 .mapboxgl-popup-close-button{
     font-size: 26px;
     display: none;
-}
-
-.mapboxgl-popup-content {
-    min-width: 400px;
 }
 
 .map-popup-title {
@@ -239,6 +243,10 @@ html {
 
 .mapboxgl-ctrl-group:not(:empty) {
     display: none;
+}
+
+.map-popup-content-wrap-right {
+    margin-left: 30px;
 }
 
 @media screen and (max-width: 1620px) {
@@ -323,5 +331,10 @@ html {
 
     .home-content-bottom-right h2 {
         font-size: 30px;
+    }
+
+    .gm-style-mtc button,
+    .gm-style-mtc label {
+        font-size: 14px !important;
     }
 }
