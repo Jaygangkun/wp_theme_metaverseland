@@ -349,7 +349,8 @@
 			map = new google.maps.Map(document.getElementById("map"), {
 				center: { lat: 40.116386, lng: -101.299591 },
 				zoom: 5,
-				gestureHandling: 'greedy'
+				gestureHandling: 'greedy',
+				mapTypeId: google.maps.MapTypeId.HYBRID
 			});
 
 			geocoder = new google.maps.Geocoder();

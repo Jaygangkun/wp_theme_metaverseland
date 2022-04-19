@@ -390,6 +390,14 @@ html {
     }
 }
 
+@media screen and (max-width: 575px) {
+    .map-tip {
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 14px;
+    }
+}
+
 @media screen and (max-width: 430px) {
     .home-header-title {
         font-size: 30px;
